@@ -8,18 +8,26 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import pg from "pg"
 
-const connectionString = process.env.DATABASE_URL
+// DDL goes over the direct connection: the transaction pooler multiplexes
+// sessions, which makes schema changes unreliable.
+const connectionString =
+  process.env.DATABASE_URL ??
+  process.env.betasignup_POSTGRES_URL_NON_POOLING ??
+  process.env.betasignup_POSTGRES_URL
 
 if (!connectionString) {
-  console.error("No DATABASE_URL. Run `vercel env pull .env.local`, or set it yourself.")
+  console.error("No connection string. Run `vercel env pull .env.local`.")
   process.exit(1)
 }
 
+// Supabase's chain is self-signed, and the `sslmode=require` in its URL would
+// otherwise override the ssl option below and demand a verifiable chain.
+const url = new URL(connectionString)
+url.searchParams.delete("sslmode")
+
 const client = new pg.Client({
-  connectionString,
-  ssl: /@(localhost|127\.0\.0\.1)[:/]/.test(connectionString)
-    ? undefined
-    : { rejectUnauthorized: false },
+  connectionString: url.toString(),
+  ssl: { rejectUnauthorized: false },
 })
 
 await client.connect()

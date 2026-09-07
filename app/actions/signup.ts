@@ -27,7 +27,7 @@ export async function joinBeta(_prev: SignupState, formData: FormData): Promise<
   }
 
   if (!isDatabaseConfigured()) {
-    console.log("[signup] DATABASE_URL is not set")
+    console.log("[signup] no Postgres connection string is set")
     return { status: "error", message: "Something went wrong. Please try again." }
   }
 
