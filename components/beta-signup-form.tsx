@@ -3,6 +3,7 @@
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { joinBeta, type SignupState } from "@/app/actions/signup"
+import type { ProjectSlug } from "@/lib/projects"
 import { Button } from "@/components/ui/button"
 
 const initialState: SignupState = { status: "idle", message: "" }
@@ -16,7 +17,7 @@ function SubmitButton() {
   )
 }
 
-export function BetaSignupForm({ project }: { project: string }) {
+export function BetaSignupForm({ project }: { project: ProjectSlug }) {
   const [state, formAction] = useActionState(joinBeta, initialState)
 
   return (
