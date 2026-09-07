@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm"
 import { check, index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core"
 
 /**
- * Mirrors lib/db/migrations/0001_create_beta_signups.sql. The SQL file is the
+ * Mirrors lib/db/schema.sql. The SQL file is the
  * source of truth (it also carries the RLS setup, which Drizzle can't express);
  * this definition exists so queries are typed.
  */

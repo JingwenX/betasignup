@@ -3,21 +3,12 @@ import { Pool } from "pg"
 import * as schema from "./schema"
 
 /**
- * Vercel's Postgres integrations (Supabase, Neon) set POSTGRES_URL rather than
- * DATABASE_URL, so accept either and prefer whichever is explicitly set.
- *
- * Order matters: the pooled URL comes before the direct one. On serverless
- * every function instance opens its own pool, and Postgres' direct connection
- * limit is far below the number of instances Vercel will happily spin up.
+ * Supabase connection string. Prefer the pooled ("Transaction pooler") URL: on
+ * serverless every function instance opens its own pool, and Postgres' direct
+ * connection limit is far below the number of instances Vercel will spin up.
  */
-const CONNECTION_STRING_VARS = ["DATABASE_URL", "POSTGRES_URL", "POSTGRES_URL_NON_POOLING"] as const
-
 export function databaseUrl(): string | undefined {
-  for (const name of CONNECTION_STRING_VARS) {
-    const value = process.env[name]
-    if (value) return value
-  }
-  return undefined
+  return process.env.DATABASE_URL || undefined
 }
 
 /**

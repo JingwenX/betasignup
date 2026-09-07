@@ -1,9 +1,15 @@
--- Beta signup capture. Run this once against the Supabase project (SQL Editor,
--- or psql "$POSTGRES_URL_NON_POOLING" -f this file).
+-- Creates the beta signup table from scratch.
 --
--- Safe to re-run: every statement is guarded.
+--   pnpm db:setup
+--   (or paste into the Supabase SQL Editor)
+--
+-- DESTRUCTIVE: this drops the table first, so applying it is a clean reset.
+-- Fine while nothing real is stored. Once actual signups exist, change this
+-- file to additive ALTERs instead of re-running it.
 
-create table if not exists public.beta_signups (
+drop table if exists public.beta_signups;
+
+create table public.beta_signups (
   id          uuid        primary key default gen_random_uuid(),
   email       text        not null,
   project     text        not null,
@@ -19,11 +25,11 @@ create table if not exists public.beta_signups (
 );
 
 -- One signup per experiment; the same person may join several.
-create unique index if not exists beta_signups_email_project_key
+create unique index beta_signups_email_project_key
   on public.beta_signups (email, project);
 
 -- The admin page lists newest first.
-create index if not exists beta_signups_created_at_idx
+create index beta_signups_created_at_idx
   on public.beta_signups (created_at desc);
 
 -- Tables in `public` are exposed through Supabase's auto-generated REST API,
